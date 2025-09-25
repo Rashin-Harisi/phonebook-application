@@ -1,3 +1,6 @@
+//This version of app is more flexible with the numbers of contact data. 
+//This version works with malloc, realloc and free function to allocate desire memory as much as it is need. 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,7 +13,8 @@ typedef struct
     char number[15];
 } User;
 
-User users[100];
+User *users = NULL;
+int capacity = 0;
 
 void firstMenue(int *c);
 void addNewContact(int *count);
@@ -21,6 +25,14 @@ int main(){
     int c;
     int count = 0;
     int running = 1;
+
+    capacity = 2; 
+    users = malloc(capacity * sizeof(User));
+    if(!users) {
+        printf("Allocating memory failed.\n");
+        return 1;
+    }
+
     while(running)
     {
         firstMenue(&c);
@@ -30,6 +42,7 @@ int main(){
         else running = 0;
     }
     printf("Goodby\n");
+    free(users);
     return 0;
 }
 void firstMenue(int *c){ 
@@ -43,25 +56,28 @@ void firstMenue(int *c){
     printf("------------------------------\n");
 }
 void addNewContact(int *count){
-    if(*count == 99 ){
-        printf("You have reached the maximum of the memory");
-        return;
-    }else{
-        printf("Please enter the requied information : \n");
-        printf("First name : ");
-        scanf("%49s",users[*count].firstName);
-        printf("\n");
-        printf("Last name : ");
-        scanf("%49s",users[*count].lastName);
-        printf("\n");
-        printf("Number : ");
-        scanf("%14s",users[*count].number);
-        printf("\n");
-        printf("New user is created successfully.\n");
-        (*count)++;
+    if(*count >= capacity ){
+        capacity *= 2;
+        users = realloc(users,capacity * sizeof(User));
+        if(!users){
+            printf("Allocating memory failed.\n");
+            exit(1);
+        }
     }
-    
+    printf("Please enter the requied information : \n");
+    printf("First name : ");
+    scanf("%49s",users[*count].firstName);
+    printf("\n");
+    printf("Last name : ");
+    scanf("%49s",users[*count].lastName);
+    printf("\n");
+    printf("Number : ");
+    scanf("%14s",users[*count].number);
+    printf("\n");
+    printf("New user is created successfully.\n");
+    (*count)++;
 };
+
 char *toUpperCase(char *str) {
     for (int i = 0; str[i] != '\0'; i++) {
         str[i] = toupper((unsigned char) str[i]);
